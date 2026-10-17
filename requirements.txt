@@ -1,0 +1,13 @@
+# Versões fixadas para reprodutibilidade (o modelo salvo em models/ foi gerado com elas)
+pandas==3.0.5
+numpy==2.5.3
+scikit-learn==1.9.1
+xgboost==3.4.1
+matplotlib==3.11.2
+joblib==1.6.0
+streamlit==1.66.0
+
+# Desenvolvimento
+pytest==9.1.1
+jupyter
+nbconvert

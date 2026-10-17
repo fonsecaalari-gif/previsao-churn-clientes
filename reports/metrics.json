@@ -1,0 +1,96 @@
+{
+  "modelo_escolhido": "XGBoost",
+  "limiar_decisao": 0.2,
+  "n_treino": 5634,
+  "n_teste": 1409,
+  "taxa_churn": 0.2653698707936959,
+  "validacao_cruzada": [
+    {
+      "modelo": "XGBoost",
+      "roc_auc_media": 0.8474,
+      "roc_auc_desvio": 0.0104,
+      "pr_auc_media": 0.6641,
+      "pr_auc_desvio": 0.0218
+    },
+    {
+      "modelo": "Regressão Logística",
+      "roc_auc_media": 0.8469,
+      "roc_auc_desvio": 0.0119,
+      "pr_auc_media": 0.6601,
+      "pr_auc_desvio": 0.0146
+    },
+    {
+      "modelo": "Random Forest",
+      "roc_auc_media": 0.8444,
+      "roc_auc_desvio": 0.0095,
+      "pr_auc_media": 0.6573,
+      "pr_auc_desvio": 0.0245
+    },
+    {
+      "modelo": "Baseline (sem modelo)",
+      "roc_auc_media": 0.5,
+      "roc_auc_desvio": 0.0,
+      "pr_auc_media": 0.2654,
+      "pr_auc_desvio": 0.0001
+    }
+  ],
+  "teste": {
+    "roc_auc": 0.8460525975871245,
+    "pr_auc": 0.666308644405858,
+    "recall": 0.8449197860962567,
+    "precisao": 0.47806354009077157,
+    "f1": 0.6106280193236715,
+    "clientes_abordados": 661,
+    "pct_base_abordada": 0.4691270404542229,
+    "matriz_confusao": [
+      [
+        690,
+        345
+      ],
+      [
+        58,
+        316
+      ]
+    ],
+    "roc_auc_por_modelo": {
+      "Baseline (sem modelo)": 0.5,
+      "Regressão Logística": 0.8448758686610349,
+      "Random Forest": 0.8423079903898318,
+      "XGBoost": 0.8460525975871245
+    },
+    "pr_auc_por_modelo": {
+      "Baseline (sem modelo)": 0.2654364797728886,
+      "Regressão Logística": 0.652654764128148,
+      "Random Forest": 0.6539550033143443,
+      "XGBoost": 0.666308644405858
+    }
+  },
+  "negocio_teste": {
+    "lucro_modelo_limiar_otimo": 52111.42,
+    "lucro_modelo_limiar_0_5": 39814.49999999999,
+    "lucro_abordar_todos": 27523.639999999985,
+    "lucro_abordagem_aleatoria_mesmo_volume": 13319.080000000002,
+    "lucro_nao_fazer_nada": 0.0
+  },
+  "importancia_permutacao": {
+    "tenure": 0.0808,
+    "Contract": 0.0686,
+    "InternetService": 0.0074,
+    "OnlineSecurity": 0.0061,
+    "TechSupport": 0.0039,
+    "PaymentMethod": 0.0037,
+    "PaperlessBilling": 0.0026,
+    "MultipleLines": 0.0021,
+    "TotalCharges": 0.0017,
+    "SeniorCitizen": 0.0017,
+    "MonthlyCharges": 0.0016,
+    "StreamingMovies": 0.0007,
+    "DeviceProtection": 0.0004,
+    "PhoneService": 0.0004,
+    "OnlineBackup": 0.0001,
+    "Dependents": 0.0001,
+    "Partner": -0.0,
+    "StreamingTV": -0.0002,
+    "gender": -0.0002
+  }
+}
