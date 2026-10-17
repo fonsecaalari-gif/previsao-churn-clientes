@@ -8,7 +8,7 @@
 
 > Modelo de Machine Learning que identifica clientes com risco de cancelar e decide **quem deve receber uma oferta de retenção para maximizar o lucro**, e não apenas uma métrica técnica.
 
-**📓 [Análise exploratória](notebooks/01_analise_exploratoria.ipynb)** · **🤖 [Modelagem](notebooks/02_modelagem.ipynb)**
+**🚀 [Testar o app ao vivo](https://previsao-churn-larissa.streamlit.app)** · **📓 [Análise exploratória](notebooks/01_analise_exploratoria.ipynb)** · **🤖 [Modelagem](notebooks/02_modelagem.ipynb)**
 
 ---
 
