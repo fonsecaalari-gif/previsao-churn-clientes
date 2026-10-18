@@ -20,7 +20,7 @@ from churn.business import lucro_campanha  # noqa: E402
 from churn.config import MODELS_DIR, RANDOM_STATE, TEST_SIZE  # noqa: E402
 from churn.data import load_dataset  # noqa: E402
 
-st.set_page_config(page_title="Previsão de Churn", page_icon="📉", layout="wide")
+st.set_page_config(page_title="Previsão de Churn", page_icon=":material/trending_down:", layout="wide")
 
 CAMINHO_MODELO = MODELS_DIR / "modelo_churn.joblib"
 
@@ -43,13 +43,13 @@ def dados_teste():
 artefato = carregar_modelo()
 modelo, limiar_padrao = artefato["pipeline"], artefato["limiar"]
 
-st.title("📉 Previsão de churn de clientes")
+st.title("Previsão de churn de clientes")
 st.caption(
     f"Modelo: **{artefato['modelo']}** · treinado com 5.634 clientes reais de telecom (dataset IBM Telco). "
-    "Código e análise completos no repositório do GitHub."
+    "Código e análise no repositório do GitHub."
 )
 
-aba1, aba2 = st.tabs(["🔎 Avaliar um cliente", "💰 Simular campanha de retenção"])
+aba1, aba2 = st.tabs(["Avaliar um cliente", "Simular campanha de retenção"])
 
 # --------------------------------------------------------------------------- aba 1
 with aba1:

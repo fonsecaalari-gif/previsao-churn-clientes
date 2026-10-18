@@ -1,8 +1,8 @@
 """Engenharia de atributos e pré-processamento.
 
 Tudo fica dentro de um ``sklearn.Pipeline``. Assim, o mesmo objeto salvo em disco
-recebe os dados *brutos* (como no CSV) e já devolve a previsão — sem risco de o
-app ou a produção aplicarem transformações diferentes das do treino.
+recebe os dados *brutos* (como no CSV) e já devolve a previsão. Assim o app e a
+produção aplicam as mesmas transformações do treino.
 """
 
 from __future__ import annotations

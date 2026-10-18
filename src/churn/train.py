@@ -10,7 +10,7 @@ Etapas:
 3. Escolhe o melhor modelo pela Precisão Média (PR-AUC), métrica adequada para
    classes desbalanceadas (~27% de churn).
 4. Escolhe o limiar de decisão que maximiza o lucro usando previsões
-   *fora da amostra* (out-of-fold) do treino — nunca o teste.
+   *fora da amostra* (out-of-fold) do treino, sem usar o teste.
 5. Treina o modelo final no treino inteiro e avalia uma única vez no teste.
 6. Salva modelo, métricas (JSON) e gráficos.
 """
@@ -187,7 +187,7 @@ def main() -> dict:
     joblib.dump({"pipeline": final, "limiar": limiar, "modelo": nome_melhor}, MODELS_DIR / "modelo_churn.joblib")
 
     plots.curvas_roc_pr(probas_teste, y_te, FIGURES_DIR / "05_curvas_roc_pr.png")
-    plots.matriz_confusao(cm, f"Matriz de confusão — limiar {plots.br(limiar)}", FIGURES_DIR / "06_matriz_confusao.png")
+    plots.matriz_confusao(cm, f"Matriz de confusão, limiar {plots.br(limiar)}", FIGURES_DIR / "06_matriz_confusao.png")
     lim, luc = curva_lucro(y_te.values, proba, mensal)
     plots.curva_de_lucro(lim, luc, limiar, "Quanto a campanha de retenção lucra em cada limiar",
                          FIGURES_DIR / "07_curva_lucro.png")

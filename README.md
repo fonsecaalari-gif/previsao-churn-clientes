@@ -1,38 +1,30 @@
-# 📉 Previsão de Churn de Clientes — do dado ao dinheiro
+# Previsão de churn de clientes
 
-![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-1.9-F7931E?logo=scikitlearn&logoColor=white)
-![XGBoost](https://img.shields.io/badge/XGBoost-3.4-189FDD)
-![Streamlit](https://img.shields.io/badge/Streamlit-app-FF4B4B?logo=streamlit&logoColor=white)
 [![testes](https://github.com/fonsecaalari-gif/previsao-churn-clientes/actions/workflows/ci.yml/badge.svg)](https://github.com/fonsecaalari-gif/previsao-churn-clientes/actions)
 
-> Modelo de Machine Learning que identifica clientes com risco de cancelar e decide **quem deve receber uma oferta de retenção para maximizar o lucro**, e não apenas uma métrica técnica.
+Modelo que estima a probabilidade de cada cliente de uma operadora de telecom cancelar o serviço e indica quem deve receber uma oferta de retenção. O limiar de decisão foi escolhido pelo lucro da campanha, e não pelo valor padrão de 0,5.
 
-**🚀 [Testar o app ao vivo](https://previsao-churn-larissa.streamlit.app)** · **📓 [Análise exploratória](notebooks/01_analise_exploratoria.ipynb)** · **🤖 [Modelagem](notebooks/02_modelagem.ipynb)**
+[App online](https://previsao-churn-larissa.streamlit.app) · [Análise exploratória](notebooks/01_analise_exploratoria.ipynb) · [Modelagem](notebooks/02_modelagem.ipynb)
 
----
+## Resultado
 
-## 🎯 Resultado em uma frase
+No conjunto de teste (1.409 clientes), a campanha guiada pelo modelo dá US$ 52 mil de lucro. É 31% a mais do que o mesmo modelo com limiar 0,5 e quase 4 vezes o lucro de abordar a mesma quantidade de clientes escolhidos ao acaso.
 
-Usando o modelo para escolher quem abordar, a campanha de retenção gera **US$ 52 mil de lucro** em 1.409 clientes de teste: **31% a mais** do que o mesmo modelo com o limiar padrão de 0,5 e **quase 4x mais** do que abordar o mesmo número de clientes ao acaso.
-
-| Estratégia (conjunto de teste, 1.409 clientes) | Lucro da campanha |
+| Estratégia | Lucro no teste |
 |---|---:|
 | Não fazer nada | US$ 0 |
 | Abordar clientes ao acaso (mesmo volume do modelo) | US$ 13.319 |
-| Abordar 100% da base | US$ 27.524 |
-| Modelo com limiar padrão (0,50) | US$ 39.814 |
-| **Modelo com limiar otimizado pelo lucro (0,20)** | **US$ 52.111** |
+| Abordar todos os clientes | US$ 27.524 |
+| Modelo com limiar 0,50 | US$ 39.814 |
+| Modelo com limiar 0,20 (escolhido pelo lucro) | US$ 52.111 |
 
----
+## Contexto
 
-## 🧩 O problema
+A empresa perde 26,5% dos clientes, e esses clientes somam 30,5% da receita mensal. Oferecer desconto para toda a base sai caro, então a pergunta é quais clientes vale a pena abordar.
 
-Uma operadora de telecom perde **26,5% dos clientes**, e esses clientes representam **30,5% da receita mensal**. Reter um cliente é mais barato que conquistar um novo, mas oferecer desconto para todo mundo custa caro. A pergunta de negócio é:
+Os dados são do [IBM Telco Customer Churn](https://github.com/IBM/telco-customer-churn-on-icp4d): 7.043 clientes e 21 colunas com perfil, serviços contratados, contrato e cobrança. Os valores estão em dólares.
 
-> **Quais clientes devemos abordar com uma oferta de retenção para ganhar o máximo de dinheiro?**
-
-## 🔍 Principais descobertas
+## Análise exploratória
 
 <table>
 <tr>
@@ -41,31 +33,31 @@ Uma operadora de telecom perde **26,5% dos clientes**, e esses clientes represen
 </tr>
 </table>
 
-- **Contrato mensal** tem 42,7% de churn, contra 2,8% no contrato de 2 anos (15x mais).
-- **55% dos cancelamentos acontecem no primeiro ano.** Nos 6 primeiros meses, o churn é de 52,9%.
-- **Pagamento por cheque eletrônico** cancela 3x mais que pagamento automático (45% x 15%).
-- Clientes com internet **sem nenhum serviço de suporte ou segurança** cancelam 56,7% das vezes.
-- O segmento **contrato mensal + fibra óptica + até 12 meses** tem **70% de churn** e concentra 13% da base.
-- **Gênero não influencia** o churn (26,9% x 26,2%), então o modelo não depende de variáveis sensíveis.
+- No contrato mensal o churn é de 42,7%. No contrato de 2 anos, 2,8%.
+- 55% dos cancelamentos acontecem no primeiro ano. Nos 6 primeiros meses o churn chega a 52,9%.
+- Quem paga com cheque eletrônico cancela 45% das vezes, contra 15% de quem paga com cartão automático.
+- Clientes com internet e sem nenhum serviço de segurança, backup ou suporte cancelam 56,7% das vezes.
+- O grupo com contrato mensal, fibra óptica e até 12 meses de casa tem 70% de churn e reúne 13% da base.
+- O gênero não muda a taxa de churn (26,9% contra 26,2%).
 
-## 🤖 Modelagem
+## Modelagem
 
-**Abordagem para evitar vazamento de dados:** teste separado logo no início (20%, estratificado), todo pré-processamento dentro de um `sklearn.Pipeline` e limiar de decisão escolhido com previsões *out-of-fold* do treino. O teste é usado uma única vez.
+Separei 20% dos clientes para teste antes de treinar os modelos e só usei esse conjunto uma vez, no final. Todo o pré-processamento fica dentro de um `sklearn.Pipeline`, e o limiar foi escolhido com previsões out-of-fold do treino.
 
 | Modelo (validação cruzada, 5 folds) | ROC-AUC | PR-AUC |
 |---|---:|---:|
 | Baseline (sem modelo) | 0,500 | 0,265 |
 | Random Forest | 0,844 ± 0,010 | 0,657 ± 0,024 |
 | Regressão Logística | 0,847 ± 0,012 | 0,660 ± 0,015 |
-| **XGBoost** | **0,847 ± 0,010** | **0,664 ± 0,022** |
+| XGBoost | 0,847 ± 0,010 | 0,664 ± 0,022 |
 
-**Leitura honesta:** os três modelos empatam dentro da margem de erro. Escolhi o XGBoost pela maior PR-AUC média, mas a Regressão Logística seria uma alternativa igualmente boa e mais fácil de explicar para o negócio.
+Os três modelos ficaram empatados dentro da margem de erro. Escolhi o XGBoost porque teve a maior PR-AUC média, mas a Regressão Logística daria resultado parecido e é mais fácil de explicar.
 
 <img src="reports/figures/05_curvas_roc_pr.png" width="100%">
 
-### De probabilidade para decisão: o limiar que dá mais lucro
+### Escolha do limiar
 
-O padrão é classificar como "vai cancelar" quem tem probabilidade ≥ 0,50. Mas **deixar de abordar um cliente que vai sair custa muito mais do que abordar alguém que ficaria**. Por isso o limiar é escolhido pelo lucro, com premissas explícitas e ajustáveis em [`config.py`](src/churn/config.py):
+Deixar de abordar um cliente que vai sair custa mais do que abordar um cliente que ficaria. Por isso calculei o lucro da campanha para cada limiar, com estas premissas (ajustáveis em [`config.py`](src/churn/config.py)):
 
 | Premissa | Valor |
 |---|---|
@@ -80,52 +72,52 @@ O padrão é classificar como "vai cancelar" quem tem probabilidade ≥ 0,50. Ma
 </tr>
 </table>
 
-No limiar de 0,20, o modelo encontra **84,5% dos clientes que iriam cancelar** abordando 47% da base (ROC-AUC 0,846 e PR-AUC 0,666 no teste).
+Com limiar 0,20, o modelo encontra 84,5% dos clientes que iriam cancelar e aborda 47% da base. No teste, o ROC-AUC foi 0,846 e a PR-AUC 0,666.
 
-### O que o modelo aprendeu
+### Variáveis mais importantes
 
 <img src="reports/figures/08_importancia.png" width="65%">
 
-Tempo de casa e tipo de contrato dominam a previsão, confirmando a análise exploratória.
+Tempo de casa e tipo de contrato explicam a maior parte da previsão, o que bate com a análise exploratória.
 
-## 💡 Recomendações para o negócio
+## Recomendações
 
-1. **Campanha de migração de contrato:** oferecer desconto para trocar o plano mensal pelo anual nos primeiros 6 meses.
-2. **Incentivo ao pagamento automático:** bônus na fatura para quem trocar o cheque eletrônico por débito ou cartão.
-3. **Pacote de boas-vindas para fibra:** suporte técnico e segurança online gratuitos nos primeiros meses.
-4. **Usar o modelo mensalmente** para priorizar quem a equipe de retenção deve contatar.
+1. Oferecer desconto para quem trocar o plano mensal pelo anual nos primeiros 6 meses.
+2. Dar um bônus na fatura para quem trocar o cheque eletrônico por débito ou cartão automático.
+3. Incluir suporte técnico e segurança online sem custo nos primeiros meses para clientes de fibra.
+4. Rodar o modelo todo mês para definir a lista de contatos da equipe de retenção.
 
-## 🖥️ App interativo
+## App
 
-Avalie o risco de qualquer cliente e simule a campanha com suas próprias premissas de custo e taxa de sucesso.
+No [app](https://previsao-churn-larissa.streamlit.app) dá para calcular o risco de um cliente e simular a campanha com outras premissas de custo e taxa de sucesso.
 
 <img src="reports/figures/app_streamlit.png" width="100%">
 
-## 🗂️ Estrutura do projeto
+## Estrutura
 
 ```
 previsao-churn-clientes/
-├── app/streamlit_app.py        # app interativo (avaliação de cliente + simulador de campanha)
+├── app/streamlit_app.py        # app (avaliação de cliente e simulador de campanha)
 ├── data/raw/                   # dataset original, sem alterações
-├── models/modelo_churn.joblib  # pipeline treinado + limiar escolhido
+├── models/modelo_churn.joblib  # pipeline treinado e limiar escolhido
 ├── notebooks/
 │   ├── 01_analise_exploratoria.ipynb
 │   └── 02_modelagem.ipynb
 ├── reports/
-│   ├── figures/                # gráficos usados neste README
-│   └── metrics.json            # todas as métricas, geradas automaticamente
+│   ├── figures/                # gráficos deste README
+│   └── metrics.json            # métricas geradas pelo treino
 ├── src/churn/
 │   ├── config.py               # caminhos e premissas de negócio
 │   ├── data.py                 # leitura e limpeza
-│   ├── features.py             # engenharia de atributos + pré-processamento
-│   ├── business.py             # cálculo de lucro e escolha do limiar
-│   ├── plots.py                # gráficos com estilo padronizado
-│   └── train.py                # pipeline completo de treino e avaliação
-├── tests/                      # 18 testes automatizados (pytest)
+│   ├── features.py             # novas variáveis e pré-processamento
+│   ├── business.py             # cálculo do lucro e escolha do limiar
+│   ├── plots.py                # gráficos
+│   └── train.py                # treino e avaliação
+├── tests/                      # 18 testes (pytest)
 └── .github/workflows/ci.yml    # roda testes e treino a cada push
 ```
 
-## ▶️ Como reproduzir
+## Como rodar
 
 ```bash
 git clone https://github.com/fonsecaalari-gif/previsao-churn-clientes.git
@@ -134,22 +126,22 @@ python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\act
 pip install -r requirements.txt && pip install -e .
 
 pytest -q                          # testes
-python -m churn.train              # treina e gera métricas e gráficos (~30 s)
+python -m churn.train              # treina e gera métricas e gráficos (cerca de 30 s)
 streamlit run app/streamlit_app.py # abre o app
 ```
 
-## ⚠️ Limitações e próximos passos
+## Limitações
 
-- O dataset é um retrato de um único momento: dados de uso, reclamações e atendimento provavelmente melhorariam bastante o modelo.
-- As premissas de custo e taxa de sucesso são estimativas; em um cenário real, viriam de um teste A/B.
-- Próximos passos: calibração das probabilidades, explicações individuais com SHAP, monitoramento de *drift* e uma API com FastAPI.
+- Os dados mostram um único momento. Histórico de uso, reclamações e atendimento devem melhorar o modelo.
+- O custo da oferta e a taxa de sucesso são estimativas. Numa empresa, esses valores viriam de um teste A/B.
+- Próximos passos: calibrar as probabilidades, gerar explicações por cliente com SHAP, monitorar drift e servir o modelo com FastAPI.
 
-## 🛠️ Tecnologias
+## Tecnologias
 
-Python · pandas · scikit-learn · XGBoost · matplotlib · Streamlit · pytest · GitHub Actions
+Python, pandas, scikit-learn, XGBoost, matplotlib, Streamlit, pytest e GitHub Actions.
 
 ---
 
-**Dados:** [IBM Telco Customer Churn](https://github.com/IBM/telco-customer-churn-on-icp4d) (Apache 2.0) · valores em dólares.
+Dados: [IBM Telco Customer Churn](https://github.com/IBM/telco-customer-churn-on-icp4d), licença Apache 2.0.
 
-**Autora:** Larissa Fonseca · [LinkedIn](https://www.linkedin.com/in/larissa-fonseca-179885170/)
+Larissa Fonseca · [LinkedIn](https://www.linkedin.com/in/larissa-fonseca-179885170/)
